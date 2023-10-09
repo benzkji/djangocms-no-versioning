@@ -23,11 +23,9 @@ djangocms-versioning, all pages are immediatly published, and cannot be hidden.
 
 ### Getting started
 
-WARNING: No testsuite yet!
-
 - there is test app, available with `./manage.py runserver`.
-- to run tests: ./manage.py test
-- to run tests with django 1.8 / 1.9 / 1.10 / 1.11: `tox`
+- to run tests: `./manage.py test`
+- to run tests with many django and cms version combinations: `tox`
 
 
 ### Contributions
@@ -37,10 +35,6 @@ If you want to contribute to this project, please perform the following steps
     # Fork this repository
     # Clone your fork
     mkvirtualenv djangocms-no-versioning
-    pip install -r test_requirements.txt
+    pip install -r dev_requirements.txt
     git checkout -b feature_branch
-    # Implement your feature and tests
-    git add . && git commit
-    tox
-    git push -u origin feature_branch
-    # Send us a pull request for your feature branch
+    ...
