@@ -1,0 +1,7 @@
+tox
+coverage
+
+django<=4
+django-appconf
+django-cms==4.1rc4
+djangocms-text-ckeditor

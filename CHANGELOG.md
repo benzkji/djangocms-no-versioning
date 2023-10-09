@@ -1,0 +1,129 @@
+==== 0.2.1 (ongoing) ===
+
+- some cleanup for django 4 compatibility (ugettext > gettext)
+
+
+==== 0.2.0 (2021-10-16) ===
+
+- remove additional h2 tag in change forms, added in django 3(.2?)
+- experimental things: add cms/plugin groups, start cms app command
+
+
+==== 0.1.21 (2021-10-16) ===
+
+- fixed bug for translation tabs and django 3.2
+
+
+==== 0.1.20 (2021-06-27) ===
+
+- management commands for easy cms/plugin auth group creation
+
+
+==== 0.1.19 (2021-06-05) ===
+
+- switched to github actions
+- django 3.2 support
+- experimental django-cms 3.9rc2 support (autopublisher broken)
+
+
+==== 0.1.18 (2021-06-04) ===
+
+- #27 - feature: add_crud_menu_item for toolbar
+- officially drop python2 support
+- fix for `djangocms_no_versioning_startapp` command (not doing anything with .pyc files)
+
+
+==== 0.1.17 (2020-09-28) ===
+
+- `djangocms_no_versioning_startapp` command, for easy django-cms enabled app bootstrapping
+- `LanguageTabsMixin` now supports tabular inlines
+
+
+==== 0.1.16 (2020-02-21) ===
+
+- fix clipboard not appearing anymore
+
+
+==== 0.1.15 (2020-02-11) ===
+
+- fix jquery issue!
+
+
+==== 0.1.14 (2020-02-11) ===
+
+- fix date/time/datetime field picker position issues
+
+
+==== 0.1.13 (2019-05-03) ===
+
+- fix for django-cms 3.6: toolbar.edit_mode_active instead of toolbar.edit_mode (supporting both)
+- djangocms_no_versioning_placeholder_empty filter
+
+
+==== 0.1.12 (2018-10-24) ===
+
+- version mess!
+
+
+==== 0.1.10 (2018-10-24) ===
+
+- fixed Page.objects.draft > drafts() exception when using djangocms_no_versioning_get_content_from_page tag
+
+
+==== 0.1.9 (2018-10-23) sorry, typo, should have been 0.1.0! ===
+
+- djangocms_no_versioning_get_content_from_page tag backwards incompatible: argument order switched, page is optional!
+- page_lookup for get_content_from_page templatetag: reverse_id, page_id or a page object supported
+
+
+==== 0.0.8 (2018-07-27) ===
+
+- officially dropping django 1.8 / 1.9 / 1.10 support
+- more and more tests
+- adding RedirectSubpageMiddleware
+- enhanced autopublisher, namely for static placeholders
+
+
+==== 0.0.7 (2018-06-16) ===
+
+- fixing https://github.com/bnzk/djangocms-no-versioning/issues/20
+- preparing for more tests
+
+
+==== 0.0.6 (2018-04-16) ===
+
+- targeting django > 1.11. django 2 support not tested yet (cms doesnt support it)!
+- hide tabular inlines title (td.original > p)
+- fiddling and fine tuning .form-row input { width: 100% } (removing it :)
+- alternate toolbar for django-cms 3.5 (tested with 3.5.1 and 3.5.2)
+- filer 1.3 and django 1.11 tested
+- docs for alternate toolbar
+
+
+==== 0.0.5 (2017-11-01) ===
+
+- added a testsuite with some basic tests
+- added djangocms_no_versioning_get_from_page_content tag (needs docs badly!)
+- added global_untranslated_placeholder app, that works somewhat reliable on django-cms=>3.4.3 (lets see :|)
+
+
+==== 0.0.4 ===
+
+- fixed template tag error, again (no output!)
+- more streamlined djangocms-admin-style experience
+
+
+==== 0.0.3 ===
+
+- fixed template tag error
+
+
+==== 0.0.2 ===
+
+- basic beta release
+- fix error 500 when adding a cms plugin ( {{ STATIC_URL }} not defined )
+
+
+==== 0.0.1 (not on pypi) ===
+
+- basic alpha release
