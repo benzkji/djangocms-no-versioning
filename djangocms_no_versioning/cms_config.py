@@ -11,6 +11,7 @@ from django.utils.translation import get_language_from_request
 
 from djangocms_no_versioning import versionables, indicators
 from djangocms_no_versioning.admin import VersioningAdminMixin
+from djangocms_no_versioning.constants import INDICATOR_DESCRIPTIONS
 from djangocms_no_versioning.datastructures import VersionableItem, BaseVersionableItem
 from djangocms_no_versioning.helpers import (
     replace_admin_for_models,

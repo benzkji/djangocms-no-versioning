@@ -617,11 +617,7 @@ class VersionAdmin(
     """Admin class used for version models."""
 
     # register custom actions
-    list_display = (
-        "content",
-    ) + (
-        "admin_list_actions",
-    )
+    list_display = ("content",) + ("admin_list_actions",)
     list_display_links = None
 
     # FIXME disabled until GenericRelation attached to content models gets

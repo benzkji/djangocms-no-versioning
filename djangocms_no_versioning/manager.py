@@ -17,9 +17,7 @@ class PublishedContentManagerMixin:
     def get_queryset(self):
         """Limit query to published content"""
         queryset = super().get_queryset()
-        if not self.versioning_enabled:
-            return queryset
-        return queryset.filter(versions__state=PUBLISHED)
+        return queryset
 
     def create(self, *args, **kwargs):
         obj = super().create(*args, **kwargs)
@@ -39,18 +37,7 @@ class PublishedContentManagerMixin:
         return obj
 
     def with_user(self, user):
-        if not isinstance(user, get_user_model()) and user is not None:
-            import inspect
-
-            curframe = inspect.currentframe()
-            callframe = inspect.getouterframes(curframe, 2)
-            calling_function = callframe[1][3]
-            raise ValueError(
-                f"With versioning enabled, {calling_function} requires a {get_user_model().__name__} instance "
-                f"to be passed as created_by argument"
-            )
         new_manager = copy(self)
-        new_manager._user = user
         return new_manager
 
 
@@ -78,7 +65,7 @@ class AdminQuerySetMixin:
         no other version type can be converted to draft without creating a new version.
         """
         qs = self.filter(
-            versions__state__in=(constants.DRAFT, constants.PUBLISHED), **kwargs
+            versions__state__in=(constants.PUBLISHED, constants.UNPUBLISHED), **kwargs
         )
         pk_filter = (
             qs.values(*self._group_by_key)
@@ -97,7 +84,9 @@ class AdminQuerySetMixin:
         the highest pk of all versions (should it exist).
         """
         current = (
-            self.filter(versions__state__in=(constants.DRAFT, constants.PUBLISHED))
+            self.filter(
+                versions__state__in=(constants.UNPUBLISHED, constants.PUBLISHED)
+            )
             .values(*self._group_by_key)
             .annotate(vers_pk=models.Max("versions__pk"))
         )
