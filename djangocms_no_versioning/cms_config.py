@@ -283,8 +283,8 @@ class PublisherCMSConfig(CMSAppConfig):
 
     cms_enabled = True
     # TODO: where is this actually used?
-    djangocms_versioning_enabled = getattr(
-        settings, "VERSIONING_CMS_MODELS_ENABLED", True
+    djangocms_no_versioning_enabled = getattr(
+        settings, "NO_VERSIONING_CMS_MODELS_ENABLED", True
     )
     versioning = [
         VersionableItem(
