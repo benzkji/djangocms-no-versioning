@@ -3,8 +3,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 
-class PublishingState(models.Model):
-    # the publishing state enabled model
+class Version(models.Model):
+    # the publishing state enabled model, as generic foreign key
     content_type = models.ForeignKey(
         ContentType,
         on_delete=models.CASCADE,
