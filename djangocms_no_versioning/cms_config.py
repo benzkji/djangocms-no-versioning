@@ -1,14 +1,17 @@
+import collections
+
 from cms.app_base import CMSAppExtension, CMSAppConfig
 from cms.models import PageContent
 from cms.utils.i18n import get_language_tuple
 from django.conf import settings
 from django.contrib.admin.utils import flatten_fieldsets
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.functional import cached_property
 from django.utils.translation import get_language_from_request
 
 from djangocms_no_versioning import versionables, indicators
 from djangocms_no_versioning.admin import VersioningAdminMixin
-from djangocms_no_versioning.datastructures import VersionableItem
+from djangocms_no_versioning.datastructures import VersionableItem, BaseVersionableItem
 from djangocms_no_versioning.helpers import (
     replace_admin_for_models,
     register_versionadmin_proxy,
@@ -31,7 +34,56 @@ CMSAppConfig: Implement versioning for core cms models
 
 class PublisherExtension(CMSAppExtension):
     def __init__(self):
-        self.publishables = []
+        self.versionables = []
+
+    @cached_property
+    def versionables_by_content(self):
+        """Returns a dict of {content_model_cls: VersionableItem obj}"""
+        return {
+            versionable.content_model: versionable for versionable in self.versionables
+        }
+
+    def is_content_model_versioned(self, content_model):
+        """Returns if the content model is registered for versioning."""
+        return content_model in self.versionables_by_content
+
+    @cached_property
+    def versionables_by_grouper(self):
+        """Returns a dict of {grouper_model_cls: VersionableItem obj}"""
+        return {
+            versionable.grouper_model: versionable
+            for versionable in self.versionables
+            # TODO: Comment on/document why this is here
+            if versionable.concrete
+        }
+
+    def is_grouper_model_versioned(self, grouper_model):
+        """Returns if the grouper model has been registered for versioning"""
+        return grouper_model in self.versionables_by_grouper
+
+    def handle_versioning_setting(self, cms_config):
+        """Check the versioning setting has been correctly set
+        and add it to the masterlist if all is ok
+        """
+        # First check that versioning is correctly defined
+        print("whate")
+        if not isinstance(cms_config.versioning, collections.abc.Iterable):
+            raise ImproperlyConfigured("versioning not defined as an iterable")
+        for versionable in cms_config.versioning:
+            if not isinstance(versionable, BaseVersionableItem):
+                raise ImproperlyConfigured(
+                    f"{versionable!r} is not a subclass of djangocms_versioning.datastructures.BaseVersionableItem"
+                )
+            # NOTE: Do not use the cached property here as this is
+            # still changing and needs to be calculated on the fly
+            registered_so_far = [v.content_model for v in self.versionables]
+            if versionable.content_model in registered_so_far:
+                raise ImproperlyConfigured(
+                    f"{versionable.content_model!r} has already been registered"
+                )
+            # Checks passed. Add versionable to our master list
+            self.versionables.append(versionable)
+        print(self.versionables)
 
     def handle_admin_classes(self, cms_config):
         """Replaces admin model classes for all registered content types
@@ -76,26 +128,29 @@ class PublisherExtension(CMSAppExtension):
                 _group_by_key=list(versionable.grouping_fields),
             )
 
-    def configure_app(self, cms_config):
-        if hasattr(cms_config, "extended_admin_field_modifiers"):
-            self.handle_admin_field_modifiers(cms_config)
+    def configure_app(self, cms_app_config):
+        print("configure")
+        if hasattr(cms_app_config, "extended_admin_field_modifiers"):
+            self.handle_admin_field_modifiers(cms_app_config)
 
         # Validation to ensure either the versioning or the
         # versioning_add_to_confirmation_context config has been defined
         has_extra_context = hasattr(
-            cms_config, "versioning_add_to_confirmation_context"
+            cms_app_config, "versioning_add_to_confirmation_context"
         )
-        has_models_to_register = hasattr(cms_config, "versioning")
+        has_models_to_register = hasattr(cms_app_config, "versioning")
         if not has_extra_context and not has_models_to_register:
             raise ImproperlyConfigured(
                 "The versioning or versioning_add_to_confirmation_context setting must be defined"
             )
+        print("self.versionables")
+        print(has_models_to_register)
         if has_models_to_register:
-            self.handle_versioning_setting(cms_config)
-            self.handle_admin_classes(cms_config)
-            self.handle_version_admin(cms_config)
-            self.handle_content_model_generic_relation(cms_config)
-            self.handle_content_model_manager(cms_config)
+            self.handle_versioning_setting(cms_app_config)
+            self.handle_admin_classes(cms_app_config)
+            self.handle_version_admin(cms_app_config)
+            self.handle_content_model_generic_relation(cms_app_config)
+            self.handle_content_model_manager(cms_app_config)
 
 
 class VersioningCMSPageAdminMixin(VersioningAdminMixin):
