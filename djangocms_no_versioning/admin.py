@@ -617,15 +617,9 @@ class VersionAdmin(
     """Admin class used for version models."""
 
     # register custom actions
-    actions = ["compare_versions"]
     list_display = (
-        "number",
-        "created",
-        "modified",
         "content",
-        "created_by",
     ) + (
-        "state",
         "admin_list_actions",
     )
     list_display_links = None
