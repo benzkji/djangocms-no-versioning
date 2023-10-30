@@ -16,6 +16,8 @@ from django.db import models
 from django.template.loader import render_to_string
 from django.utils.encoding import force_str
 
+from djangocms_no_versioning import versionables
+
 # from . import versionables
 # from .conf import EMAIL_NOTIFICATIONS_FAIL_SILENTLY
 # from .constants import DRAFT

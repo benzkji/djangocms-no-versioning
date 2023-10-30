@@ -72,3 +72,11 @@ class Version(models.Model):
         of the version
         """
         return versionables.for_content(self.content)
+
+    def publish(self, user):
+        self.published = True
+        self.save()
+
+    def unpublish(self, user):
+        self.published = False
+        self.save()

@@ -155,24 +155,24 @@ class PublisherExtension(CMSAppExtension):
 class VersioningCMSPageAdminMixin(VersioningAdminMixin):
     def get_readonly_fields(self, request, obj=None):
         fields = super().get_readonly_fields(request, obj)
-        if obj:
-            version = Version.objects.get_for_content(obj)
-            if not version.check_modify.as_bool(request.user):
-                form = self.get_form_class(request)
-                if form.fieldsets:
-                    fields = flatten_fieldsets(form.fieldsets)
-                fields = list(fields)
-                for f_name in ["slug", "overwrite_url"]:
-                    fields.remove(f_name)
+        # if obj:
+        #     version = Version.objects.get_for_content(obj)
+        #     if not version.check_modify.as_bool(request.user):
+        #         form = self.get_form_class(request)
+        #         if form.fieldsets:
+        #             fields = flatten_fieldsets(form.fieldsets)
+        #         fields = list(fields)
+        #         for f_name in ["slug", "overwrite_url"]:
+        #             fields.remove(f_name)
         return fields
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
-        if obj:
-            version = Version.objects.get_for_content(obj)
-            if not version.check_modify.as_bool(request.user):
-                for f_name in ["slug", "overwrite_url"]:
-                    form.declared_fields[f_name].widget.attrs["readonly"] = True
+        # if obj:
+        #     version = Version.objects.get_for_content(obj)
+        #     if not version.check_modify.as_bool(request.user):
+        #         for f_name in ["slug", "overwrite_url"]:
+        #             form.declared_fields[f_name].widget.attrs["readonly"] = True
         return form
 
     def get_queryset(self, request):

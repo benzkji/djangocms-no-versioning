@@ -76,23 +76,7 @@ class AdminQuerySetMixin:
         This filter assumes that there can only be one draft created and that the draft as
         the highest pk of all versions (should it exist).
         """
-        current = (
-            self.filter(
-                versions__state__in=(constants.UNPUBLISHED, constants.PUBLISHED)
-            )
-            .values(*self._group_by_key)
-            .annotate(vers_pk=models.Max("versions__pk"))
-        )
-        pk_current = current.values("vers_pk")
-        pk_other = (
-            self.exclude(
-                **{key + "__in": current.values(key) for key in self._group_by_key}
-            )
-            .values(*self._group_by_key)
-            .annotate(vers_pk=models.Max("versions__pk"))
-            .values("vers_pk")
-        )
-        return self.filter(versions__pk__in=pk_current | pk_other, **kwargs)
+        return self.current_content()
 
 
 class AdminManagerMixin:

@@ -45,6 +45,7 @@ from .helpers import (
     get_editable_url,
     get_preview_url,
     proxy_model,
+    version_list_url,
     # remove_version_lock,
     # version_is_locked,
     # version_list_url,
@@ -964,15 +965,6 @@ class VersionAdmin(
                 request, self.model._meta, object_id
             )
 
-        if not version.can_be_published():
-            self.message_user(request, _("Version cannot be published"), messages.ERROR)
-            return redirect(version_list_url(version.content))
-        try:
-            version.check_publish(request.user)
-        except ConditionFailed as e:
-            self.message_user(request, force_str(e), messages.ERROR)
-            return redirect(version_list_url(version.content))
-
         # Publish the version
         version.publish(request.user)
         # Display message
@@ -990,17 +982,6 @@ class VersionAdmin(
             return self._get_obj_does_not_exist_redirect(
                 request, self.model._meta, object_id
             )
-
-        if not version.can_be_unpublished():
-            self.message_user(
-                request, _("Version cannot be unpublished"), messages.ERROR
-            )
-            return redirect(version_list_url(version.content))
-        try:
-            version.check_unpublish(request.user)
-        except ConditionFailed as e:
-            self.message_user(request, force_str(e), messages.ERROR)
-            return redirect(version_list_url(version.content))
 
         if request.method != "POST":
             context = {
@@ -1361,16 +1342,6 @@ class VersionAdmin(
         info = self.model._meta.app_label, self.model._meta.model_name
         return [
             path(
-                "select/",
-                self.admin_site.admin_view(self.grouper_form_view),
-                name="{}_{}_grouper".format(*info),
-            ),
-            path(
-                "<path:object_id>/archive/",
-                self.admin_site.admin_view(self.archive_view),
-                name="{}_{}_archive".format(*info),
-            ),
-            path(
                 r"<path:object_id>/publish/",
                 self.admin_site.admin_view(self.publish_view),
                 name="{}_{}_publish".format(*info),
@@ -1380,31 +1351,41 @@ class VersionAdmin(
                 self.admin_site.admin_view(self.unpublish_view),
                 name="{}_{}_unpublish".format(*info),
             ),
-            path(
-                "<path:object_id>/edit-redirect/",
-                self.admin_site.admin_view(self.edit_redirect_view),
-                name="{}_{}_edit_redirect".format(*info),
-            ),
-            path(
-                "<path:object_id>/revert/",
-                self.admin_site.admin_view(self.revert_view),
-                name="{}_{}_revert".format(*info),
-            ),
-            path(
-                "<path:object_id>/compare/",
-                self.admin_site.admin_view(self.compare_view),
-                name="{}_{}_compare".format(*info),
-            ),
-            path(
-                "<path:object_id>/discard/",
-                self.admin_site.admin_view(self.discard_view),
-                name="{}_{}_discard".format(*info),
-            ),
-            path(
-                "<path:object_id>/unlock/",
-                self.admin_site.admin_view(self.unlock_view),
-                name="{}_{}_unlock".format(*info),
-            ),
+            # path(
+            #     "select/",
+            #     self.admin_site.admin_view(self.grouper_form_view),
+            #     name="{}_{}_grouper".format(*info),
+            # ),
+            # path(
+            #     "<path:object_id>/archive/",
+            #     self.admin_site.admin_view(self.archive_view),
+            #     name="{}_{}_archive".format(*info),
+            # ),
+            # path(
+            #     "<path:object_id>/edit-redirect/",
+            #     self.admin_site.admin_view(self.edit_redirect_view),
+            #     name="{}_{}_edit_redirect".format(*info),
+            # ),
+            # path(
+            #     "<path:object_id>/revert/",
+            #     self.admin_site.admin_view(self.revert_view),
+            #     name="{}_{}_revert".format(*info),
+            # ),
+            # path(
+            #     "<path:object_id>/compare/",
+            #     self.admin_site.admin_view(self.compare_view),
+            #     name="{}_{}_compare".format(*info),
+            # ),
+            # path(
+            #     "<path:object_id>/discard/",
+            #     self.admin_site.admin_view(self.discard_view),
+            #     name="{}_{}_discard".format(*info),
+            # ),
+            # path(
+            #     "<path:object_id>/unlock/",
+            #     self.admin_site.admin_view(self.unlock_view),
+            #     name="{}_{}_unlock".format(*info),
+            # ),
         ] + super().get_urls()
 
     def has_add_permission(self, request):
