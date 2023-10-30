@@ -8,7 +8,7 @@ from cms.admin.utils import CONTENT_PREFIX, ChangeListActionsMixin, GrouperModel
 from cms.models import PageContent
 from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
-from cms.utils.urlutils import add_url_parameters, static_with_version
+from cms.utils.urlutils import add_url_parameters, static_with_version, admin_reverse
 from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.options import IncorrectLookupParameters
@@ -103,11 +103,10 @@ class VersioningAdminMixin:
         """
         super().save_model(request, obj, form, change)
         if not change:
-            # if isinstance(obj, PageContent):
-            #     # FIXME disabled version creation for `cms.PageContent`
-            #     # here, as it's already done in `cms.api.create_title`
-            #     return
-            # create a new version object and save it
+            if isinstance(obj, PageContent):
+                # FIXME disabled version creation for `cms.PageContent`
+                # here, as it's already done in `cms.api.create_title`
+                return
             Version.objects.create(content=obj)
 
     def get_queryset(self, request):
@@ -969,8 +968,12 @@ class VersionAdmin(
         version.publish(request.user)
         # Display message
         self.message_user(request, _("Version published"))
-        # Redirect
-        return redirect(version_list_url(version.content))
+        # Redirect to changelist
+        return redirect(
+            admin_reverse(
+                f"{version.content._meta.app_label}_{version.content._meta.model_name}_changelist"
+            )
+        )
 
     def unpublish_view(self, request, object_id):
         """Unpublishes the specified version and redirects back to the
@@ -1013,8 +1016,14 @@ class VersionAdmin(
             version.unpublish(request.user)
             # Display message
             self.message_user(request, _("Version unpublished"))
+
         # Redirect
-        return redirect(version_list_url(version.content))
+        # return redirect(version_list_url(version.content))
+        return redirect(
+            admin_reverse(
+                f"{version.content._meta.app_label}_{version.content._meta.model_name}_changelist"
+            )
+        )
 
     def _get_edit_redirect_version(self, request, version):
         """Helper method to get the latest draft or create one if one does not exist."""
