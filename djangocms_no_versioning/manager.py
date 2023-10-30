@@ -17,6 +17,9 @@ class PublishedContentManagerMixin:
     def get_queryset(self):
         """Limit query to published content"""
         qs = super().get_queryset()
+        # TODO: when is versioning_enabled False?
+        if not self.versioning_enabled:
+            return qs
         qs = qs.filter(versions__published=True)
         return qs
 
