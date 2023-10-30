@@ -52,7 +52,6 @@ class Version(models.Model):
     content_type = models.ForeignKey(
         ContentType,
         on_delete=models.CASCADE,
-        related_name="cms_publishing_state",
     )
     object_id = models.PositiveIntegerField()
     content = GenericForeignKey("content_type", "object_id")
@@ -66,3 +65,10 @@ class Version(models.Model):
 
     def __str__(self):
         return f"Version #{self.pk}"
+
+    @property
+    def versionable(self):
+        """Helper property to get the versionable for the content type
+        of the version
+        """
+        return versionables.for_content(self.content)

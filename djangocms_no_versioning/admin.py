@@ -102,12 +102,12 @@ class VersioningAdminMixin:
         """
         super().save_model(request, obj, form, change)
         if not change:
-            if isinstance(obj, PageContent):
-                # FIXME disabled version creation for `cms.PageContent`
-                # here, as it's already done in `cms.api.create_title`
-                return
+            # if isinstance(obj, PageContent):
+            #     # FIXME disabled version creation for `cms.PageContent`
+            #     # here, as it's already done in `cms.api.create_title`
+            #     return
             # create a new version object and save it
-            Version.objects.create(content=obj, created_by=request.user)
+            Version.objects.create(content=obj)
 
     def get_queryset(self, request):
         """Override manager so records not in published state can be displayed"""

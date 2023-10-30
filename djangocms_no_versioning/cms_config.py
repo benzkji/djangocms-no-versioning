@@ -3,6 +3,7 @@ import collections
 from cms.app_base import CMSAppExtension, CMSAppConfig
 from cms.models import PageContent
 from cms.utils.i18n import get_language_tuple
+from cms.utils.urlutils import admin_reverse
 from django.conf import settings
 from django.contrib.admin.utils import flatten_fieldsets
 from django.core.exceptions import ImproperlyConfigured
@@ -67,7 +68,6 @@ class PublisherExtension(CMSAppExtension):
         and add it to the masterlist if all is ok
         """
         # First check that versioning is correctly defined
-        print("whate")
         if not isinstance(cms_config.versioning, collections.abc.Iterable):
             raise ImproperlyConfigured("versioning not defined as an iterable")
         for versionable in cms_config.versioning:
@@ -130,7 +130,6 @@ class PublisherExtension(CMSAppExtension):
             )
 
     def configure_app(self, cms_app_config):
-        print("configure")
         if hasattr(cms_app_config, "extended_admin_field_modifiers"):
             self.handle_admin_field_modifiers(cms_app_config)
 
@@ -144,8 +143,7 @@ class PublisherExtension(CMSAppExtension):
             raise ImproperlyConfigured(
                 "The versioning or versioning_add_to_confirmation_context setting must be defined"
             )
-        print("self.versionables")
-        print(has_models_to_register)
+
         if has_models_to_register:
             self.handle_versioning_setting(cms_app_config)
             self.handle_admin_classes(cms_app_config)

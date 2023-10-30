@@ -23,121 +23,29 @@ def _reverse_action(version, action, back=None):
     )
 
 
-def content_indicator_menu(request, status, versions, back=""):
+def content_indicator_menu(request, status, version, back=""):
     from .helpers import version_list_url
 
     menu = []
-    if request.user.has_perm(
-        f"cms.{get_permission_codename('change', versions[0]._meta)}"
-    ):
-        if versions[0].check_unlock.as_bool(request.user):
-            can_unlock = request.user.has_perm(
-                "djangocms_versioning.delete_versionlock"
-            )
-            # disable if permissions are insufficient
-            additional_class = (
-                "" if can_unlock else " cms-pagetree-dropdown-item-disabled"
-            )
-            menu.append(
-                (
-                    _("Unlock (%(message)s)")
-                    % {"message": versions[0].locked_message()},
-                    "cms-icon-unlock",
-                    _reverse_action(versions[0], "unlock"),
-                    "js-cms-tree-lang-trigger"
-                    + additional_class,  # Triggers POST from the frontend
-                )
-            )
-        if versions[0].check_publish.as_bool(request.user):
+    if request.user.has_perm(f"cms.{get_permission_codename('change', version._meta)}"):
+        if not version.published:
             menu.append(
                 (
                     _("Publish"),
                     "cms-icon-publish",
-                    _reverse_action(versions[0], "publish"),
+                    _reverse_action(version, "publish"),
                     "js-cms-tree-lang-trigger",  # Triggers POST from the frontend
                 )
             )
-        if (
-            versions[0].check_edit_redirect.as_bool(request.user)
-            and versions[0].state == PUBLISHED
-        ):
-            menu.append(
-                (
-                    _("Create new draft"),
-                    "cms-icon-edit-new",
-                    _reverse_action(versions[0], "edit_redirect"),
-                    "js-cms-tree-lang-trigger js-cms-pagetree-page-view",  # Triggers POST from the frontend
-                )
-            )
-        if (
-            versions[0].check_revert.as_bool(request.user)
-            and versions[0].state == UNPUBLISHED
-        ):
-            # Do not offer revert from unpublish -> archived versions to be managed in version admin
-            label = _("Revert from Unpublish")
-            menu.append(
-                (
-                    label,
-                    "cms-icon-undo",
-                    _reverse_action(versions[0], "revert"),
-                    "js-cms-tree-lang-trigger",  # Triggers POST from the frontend
-                )
-            )
-        if versions[0].check_unpublish.as_bool(request.user):
+        if version.published:
             menu.append(
                 (
                     _("Unpublish"),
                     "cms-icon-unpublish",
-                    _reverse_action(versions[0], "unpublish"),
+                    _reverse_action(version, "unpublish"),
                     "js-cms-tree-lang-trigger",
                 )
             )
-        if len(versions) > 1 and versions[1].check_unpublish.as_bool(request.user):
-            menu.append(
-                (
-                    _("Unpublish"),
-                    "cms-icon-unpublish",
-                    _reverse_action(versions[1], "unpublish"),
-                    "js-cms-tree-lang-trigger",
-                )
-            )
-        if versions[0].check_discard.as_bool(request.user):
-            menu.append(
-                (
-                    _("Delete Draft") if status == DRAFT else _("Discard Changes"),
-                    "cms-icon-bin",
-                    _reverse_action(versions[0], "discard", back=back),
-                    "",  # Let view ask for confirmation
-                )
-            )
-        if (
-            len(versions) >= 2
-            and versions[0].state == DRAFT
-            and versions[1].state == PUBLISHED
-        ):
-            menu.append(
-                (
-                    _("Compare Draft to Published..."),
-                    "cms-icon-layers",
-                    _reverse_action(versions[1], "compare")
-                    + "?"
-                    + urlencode(
-                        {
-                            "compare_to": versions[0].pk,
-                            "back": back,
-                        }
-                    ),
-                    "",
-                )
-            )
-    menu.append(
-        (
-            _("Manage Versions..."),
-            "cms-icon-copy",
-            version_list_url(versions[0].content),
-            "",
-        )
-    )
     return menu
 
 
@@ -148,21 +56,12 @@ def content_indicator(content_obj):
     if not content_obj:
         return None  # pragma: no cover
     elif not hasattr(content_obj, "_indicator_status"):
-        versions = Version.objects.filter_by_content_grouping_values(
-            content_obj
-        ).order_by("-pk")
-        signature = {
-            state: versions.filter(state=state) for state, name in VERSION_STATES
-        }
-        if signature[PUBLISHED]:
+        version = Version.objects.get_for_content(content_obj)
+        content_obj._version = version
+        if version.published:
             content_obj._indicator_status = "published"
-            content_obj._version = signature[PUBLISHED]
-        elif versions[0].state == UNPUBLISHED:
+        else:
             content_obj._indicator_status = "unpublished"
-            content_obj._version = signature[UNPUBLISHED]
-        else:  # pragma: no cover
-            content_obj._indicator_status = None
-            content_obj._version = [None]
     return content_obj._indicator_status
 
 

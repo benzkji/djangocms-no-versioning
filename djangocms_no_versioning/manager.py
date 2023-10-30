@@ -64,15 +64,8 @@ class AdminQuerySetMixin:
         draft versions always have a higher pk than any other version type. This is true as long as
         no other version type can be converted to draft without creating a new version.
         """
-        qs = self.filter(
-            versions__state__in=(constants.PUBLISHED, constants.UNPUBLISHED), **kwargs
-        )
-        pk_filter = (
-            qs.values(*self._group_by_key)
-            .annotate(vers_pk=models.Max("versions__pk"))
-            .values_list("vers_pk", flat=True)
-        )
-        return qs.filter(versions__pk__in=pk_filter)
+        qs = self.filter(**kwargs)
+        return qs
 
     def latest_content(self, **kwargs):
         """Returns the "latest" content object which is in this order
