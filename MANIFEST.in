@@ -3,8 +3,4 @@ include README.md
 include PYPI.md
 global-exclude *.orig *.pyc *.log *.swp
 
-recursive-include djangocms_no_versioning/basic *
-recursive-include djangocms_no_versioning/autopublisher *
-recursive-include djangocms_no_versioning/global_untranslated_placeholder *
-recursive-include djangocms_no_versioning/admin_style *
-recursive-include djangocms_no_versioning/apphook_templates *
+recursive-include djangocms_no_versioning *
