@@ -11,8 +11,8 @@
 [//]: # ()
 [//]: # ([![PyPI Downloads]&#40;https://img.shields.io/pypi/dm/djangocms-no-versioning?style=flat-square "PyPi Downloads"&#41;]&#40;https://pypistats.org/packages/djangocms-no-versioning&#41;)
 
-This is a proof of concept, to enable published/unpublished pages in django-cms v4+, without versioning. As without
-djangocms-versioning, all pages are immediatly published, and cannot be hidden.
+This is a proof of concept, to enable published/unpublished pages in django-cms v4+, without versioning (i.e. as a [djangocms-versioning](https://github.com/django-cms/djangocms-versioning) replacement). As without
+djangocms-versioning, all pages are immediatly published, and cannot be hidden at all (only removed from menu, which is not enough).
 
 ## Features
 
