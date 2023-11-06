@@ -280,6 +280,25 @@ class VersioningCMSPageAdminMixin(VersioningAdminMixin):
         return menu_template if menu else "", menu
 
 
+def on_page_content_publish(version):
+    """Url path and cache operations to do when a PageContent obj is published"""
+    page = version.content.page
+    language = version.content.language
+    page._update_url_path(language)
+    if page.is_home:
+        page._remove_title_root_path()
+    page._update_url_path_recursive(language)
+    page.clear_cache(menu=True)
+
+
+def on_page_content_unpublish(version):
+    """Url path and cache operations to do when a PageContent obj is unpublished"""
+    page = version.content.page
+    language = version.content.language
+    page._update_url_path_recursive(language)
+    page.clear_cache(menu=True)
+
+
 class PublisherCMSConfig(CMSAppConfig):
     """Implement versioning for core cms models"""
 
@@ -296,14 +315,12 @@ class PublisherCMSConfig(CMSAppConfig):
             version_list_filter_lookups={"language": get_language_tuple},
             # copy_function=copy_page_content,
             # grouper_selector_option_label=label_from_instance,
-            # on_publish=on_page_content_publish,
-            # on_unpublish=on_page_content_unpublish,
+            on_publish=on_page_content_publish,
+            on_unpublish=on_page_content_unpublish,
             # on_draft_create=on_page_content_draft_create,
             # on_archive=on_page_content_archive,
             copy_function=None,
             grouper_selector_option_label=None,
-            on_publish=None,
-            on_unpublish=None,
             on_draft_create=None,
             on_archive=None,
             content_admin_mixin=VersioningCMSPageAdminMixin,

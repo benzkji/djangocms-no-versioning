@@ -123,6 +123,7 @@ EXTERNAL_APPS = [
     "cms",
     "menus",
     "djangocms_text_ckeditor",
+    "djangocms_admin_style",
     "django.contrib.admin",
 ]
 

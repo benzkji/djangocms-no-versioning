@@ -76,7 +76,13 @@ class Version(models.Model):
     def publish(self, user):
         self.published = True
         self.save()
+        on_publish = self.versionable.on_publish
+        if on_publish:
+            on_publish(self)
 
     def unpublish(self, user):
         self.published = False
         self.save()
+        on_unpublish = self.versionable.on_unpublish
+        if on_unpublish:
+            on_unpublish(self)
