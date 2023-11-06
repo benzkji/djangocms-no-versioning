@@ -372,22 +372,22 @@ class ExtendedVersionAdminMixin(
     inherits this Mixin it will require accommodating/reimplementing this.
     """
 
-    versioning_list_display = (
-        "get_author",
-        "get_modified_date",
-        "get_versioning_state",
-    )
+    # versioning_list_display = (
+    #     "get_author",
+    #     "get_modified_date",
+    #     "get_versioning_state",
+    # )
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         # Due to django admin ordering using unicode, to alphabetically order regardless of case, we must
         # annotate the queryset, with the usernames all lower case, and then order based on that!
 
-        queryset = queryset.annotate(
-            created_by_username_ordering=Lower(
-                f"versions__created_by__{conf.USERNAME_FIELD}"
-            )
-        )
+        # queryset = queryset.annotate(
+        #     created_by_username_ordering=Lower(
+        #         f"versions__created_by__{conf.USERNAME_FIELD}"
+        #     )
+        # )
         return queryset
 
     def get_version(self, obj):
@@ -542,50 +542,50 @@ class ExtendedIndicatorVersionAdminMixin(
     )
 
 
-class VersionChangeList(ChangeList):
-    def get_filters_params(self, params=None):
-        """Removes the grouper param from the filters as the main grouper
-        filtering is not handled by the UI filters and therefore needs to be
-        handled differently.
-        """
-        content_model = self.model_admin.model._source_model
-        versionable = versionables.for_content(content_model)
-        filter_params = super().get_filters_params(params)
-        filter_params.pop(versionable.grouper_field_name, None)
-        return filter_params
-
-    def get_grouping_field_filters(self, request):
-        """Handles extra grouping params (such as PageContent.language).
-
-        The get_filters_params method does return these filters as they are
-        visible in the UI, however they need extra handling due to db
-        optimization and the difficulties involved in handling the
-        generic foreign key from Version to the content model."""
-        content_model = self.model_admin.model._source_model
-        versionable = versionables.for_content(content_model)
-        fields = versionable.grouping_fields
-        for field in fields:
-            value = request.GET.get(field)
-            if value is not None:
-                yield field, value
-
-    def get_queryset(self, request):
-        """Adds support for querying the version model by grouping fields.
-
-        Filters by the value of grouping fields (specified in VersionableItem
-        definition) of content model.
-
-        Functionality is implemented here, because list_filter doesn't allow
-        for specifying filters that work without being shown in the UI
-        along with filter choices.
-        """
-        queryset = super().get_queryset(request)
-        content_model = self.model_admin.model._source_model
-        versionable = versionables.for_content(content_model)
-        filters = dict(self.get_grouping_field_filters(request))
-        if versionable.grouper_field_name not in filters:
-            raise IncorrectLookupParameters("Missing grouper")
-        return queryset.filter_by_grouping_values(versionable, **filters)
+# class VersionChangeList(ChangeList):
+#     def get_filters_params(self, params=None):
+#         """Removes the grouper param from the filters as the main grouper
+#         filtering is not handled by the UI filters and therefore needs to be
+#         handled differently.
+#         """
+#         content_model = self.model_admin.model._source_model
+#         versionable = versionables.for_content(content_model)
+#         filter_params = super().get_filters_params(params)
+#         filter_params.pop(versionable.grouper_field_name, None)
+#         return filter_params
+#
+#     def get_grouping_field_filters(self, request):
+#         """Handles extra grouping params (such as PageContent.language).
+#
+#         The get_filters_params method does return these filters as they are
+#         visible in the UI, however they need extra handling due to db
+#         optimization and the difficulties involved in handling the
+#         generic foreign key from Version to the content model."""
+#         content_model = self.model_admin.model._source_model
+#         versionable = versionables.for_content(content_model)
+#         fields = versionable.grouping_fields
+#         for field in fields:
+#             value = request.GET.get(field)
+#             if value is not None:
+#                 yield field, value
+#
+#     def get_queryset(self, request):
+#         """Adds support for querying the version model by grouping fields.
+#
+#         Filters by the value of grouping fields (specified in VersionableItem
+#         definition) of content model.
+#
+#         Functionality is implemented here, because list_filter doesn't allow
+#         for specifying filters that work without being shown in the UI
+#         along with filter choices.
+#         """
+#         queryset = super().get_queryset(request)
+#         content_model = self.model_admin.model._source_model
+#         versionable = versionables.for_content(content_model)
+#         filters = dict(self.get_grouping_field_filters(request))
+#         if versionable.grouper_field_name not in filters:
+#             raise IncorrectLookupParameters("Missing grouper")
+#         return queryset.filter_by_grouping_values(versionable, **filters)
 
 
 def fake_filter_factory(versionable, field_name):
@@ -626,8 +626,8 @@ class VersionAdmin(
     # def get_queryset(self, request):
     #     return super().get_queryset(request).prefetch_related('content')
 
-    def get_changelist(self, request, **kwargs):
-        return VersionChangeList
+    # def get_changelist(self, request, **kwargs):
+    #     return VersionChangeList
 
     def get_list_filter(self, request):
         """Adds the filters for the extra grouping fields to the UI."""
@@ -663,14 +663,14 @@ class VersionAdmin(
             label=content,
         )
 
-    @admin.display(description=_("locked"))
-    def locked(self, version):
-        """
-        Generate an locked field for Versioning Admin
-        """
-        if version.state == DRAFT and version_is_locked(version):
-            return mark_safe('<span class="cms-icon cms-icon-lock"></span>')
-        return ""
+    # @admin.display(description=_("locked"))
+    # def locked(self, version):
+    #     """
+    #     Generate an locked field for Versioning Admin
+    #     """
+    #     if version.state == DRAFT and version_is_locked(version):
+    #         return mark_safe('<span class="cms-icon cms-icon-lock"></span>')
+    #     return ""
 
     def _get_preview_link(self, obj, request):
         if obj.state == DRAFT:
@@ -968,7 +968,9 @@ class VersionAdmin(
         version.publish(request.user)
         # Display message
         self.message_user(request, _("Version published"))
-        # Redirect to changelist
+        # Redirect to changelist or live version, depending on referrer
+        if "/admin/cms/placeholder/" in request.META.get("HTTP_REFERER", ""):
+            return redirect(version.content.get_absolute_url())
         return redirect(
             admin_reverse(
                 f"{version.content._meta.app_label}_{version.content._meta.model_name}_changelist"

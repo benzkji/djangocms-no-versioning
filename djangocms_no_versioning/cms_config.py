@@ -2,16 +2,19 @@ import collections
 
 from cms.app_base import CMSAppExtension, CMSAppConfig
 from cms.models import PageContent
+from cms.utils import get_language_from_request
 from cms.utils.i18n import get_language_tuple
 from cms.utils.urlutils import admin_reverse
 from django.conf import settings
 from django.contrib.admin.utils import flatten_fieldsets
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import cached_property
-from django.utils.translation import get_language_from_request
 
 from djangocms_no_versioning import versionables, indicators
-from djangocms_no_versioning.admin import VersioningAdminMixin
+from djangocms_no_versioning.admin import (
+    VersioningAdminMixin,
+    ExtendedVersionAdminMixin,
+)
 from djangocms_no_versioning.constants import INDICATOR_DESCRIPTIONS
 from djangocms_no_versioning.datastructures import VersionableItem, BaseVersionableItem
 from djangocms_no_versioning.helpers import (
@@ -304,6 +307,7 @@ class PublisherCMSConfig(CMSAppConfig):
             on_draft_create=None,
             on_archive=None,
             content_admin_mixin=VersioningCMSPageAdminMixin,
+            # content_admin_mixin=ExtendedVersionAdminMixin,
         )
     ]
     # cms_toolbar_mixin = CMSToolbarVersioningMixin
