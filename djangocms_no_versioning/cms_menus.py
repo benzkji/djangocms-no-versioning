@@ -7,7 +7,11 @@ from cms.cms_menus import (
     get_menu_node_for_page,
 )
 from cms.models import Page
-from cms.toolbar.utils import get_object_preview_url, get_toolbar_from_request
+from cms.toolbar.utils import (
+    get_object_preview_url,
+    get_toolbar_from_request,
+    get_object_edit_url,
+)
 from cms.utils.page import get_page_queryset
 from django.apps import apps
 from menus.base import Menu, NavigationNode
@@ -90,13 +94,13 @@ class CMSMenu(Menu):
 
         cms_extension = apps.get_app_config("djangocms_no_versioning").cms_extension
         toolbar = get_toolbar_from_request(request)
-        edit_or_preview = toolbar.edit_mode_active
+        is_edit_mode = toolbar.edit_mode_active
         menu_nodes = []
         node_id_to_page = {}
         homepage_content = None
 
         # Depending on the toolbar mode, we need to get the correct version.
-        if edit_or_preview:
+        if is_edit_mode:
             published_filter = {}
         else:
             published_filter = {"versions__published": True}
@@ -131,8 +135,8 @@ class CMSMenu(Menu):
                 continue
 
             # Construct the url based on the toolbar mode.
-            if edit_or_preview:
-                url = get_object_preview_url(page_content)
+            if is_edit_mode:
+                url = get_object_edit_url(page_content)
             else:
                 url = page_content.get_absolute_url()
 

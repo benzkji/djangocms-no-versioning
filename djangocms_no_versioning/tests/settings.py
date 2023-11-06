@@ -93,6 +93,10 @@ TEMPLATES = [
 CMS_TEMPLATES = (("base.html", "Default"),)
 
 CMS_PERMISSION = True
+CMS_CACHE_DURATIONS = {
+    "menus": 60,
+    "content": 60,
+}
 
 COVERAGE_REPORT_HTML_OUTPUT_DIR = os.path.join(os.path.join(APP_ROOT, "tests/coverage"))
 COVERAGE_MODULE_EXCLUDES = [
@@ -133,6 +137,7 @@ COVERAGE_MODULE_EXCLUDES += EXTERNAL_APPS
 SECRET_KEY = "foobarasdvcasdvasXXXxxsvXY"
 
 MIDDLEWARE = [
+    "django.middleware.cache.UpdateCacheMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -143,4 +148,5 @@ MIDDLEWARE = [
     "cms.middleware.page.CurrentPageMiddleware",
     "cms.middleware.toolbar.ToolbarMiddleware",
     "cms.middleware.language.LanguageCookieMiddleware",
+    "django.middleware.cache.FetchFromCacheMiddleware",
 ]
