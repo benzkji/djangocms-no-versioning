@@ -251,11 +251,6 @@ class VersioningCMSPageAdminMixin(VersioningAdminMixin):
     def change_innavigation(self, request, object_id):
         page_content = self.get_object(request, object_id=object_id)
         version = Version.objects.get_for_content(page_content)
-        try:
-            version.check_modify(request.user)
-        except ConditionFailed as e:
-            # Send error message
-            return HttpResponseForbidden(force_str(e))
         return super().change_innavigation(request, object_id)
 
     @property

@@ -120,11 +120,21 @@ EXTERNAL_APPS = [
     "django.contrib.sites",
     "sekizai",
     "treebeard",
+    "easy_thumbnails",
     "cms",
     "menus",
+    "djangocms_alias",
+    "parler",
+    # "djangocms_blog",
     "djangocms_text_ckeditor",
     "djangocms_admin_style",
     "django.contrib.admin",
+    # blog
+    "filer",
+    "taggit",
+    "taggit_autosuggest",
+    "meta",
+    "sortedm2m",
 ]
 
 INTERNAL_APPS = [
