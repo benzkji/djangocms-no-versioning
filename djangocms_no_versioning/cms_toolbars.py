@@ -3,6 +3,7 @@ from collections import OrderedDict
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from cms.toolbar.items import ButtonList
+from cms.toolbar.utils import get_object_preview_url
 from cms.toolbar_pool import toolbar_pool
 from cms.cms_toolbars import PlaceholderToolbar
 from django.apps import apps
@@ -32,7 +33,10 @@ class NoVersioningToolbar(PlaceholderToolbar):
         item = ButtonList(side=self.toolbar.RIGHT)
         version = self.toolbar.obj.versions.first()
         if version.published:
-            url = self.toolbar.obj.get_absolute_url()
+            if hasattr(self.toolbar.obj, "get_absolute_url"):
+                url = self.toolbar.obj.get_absolute_url()
+            else:
+                url = get_object_preview_url(self.toolbar.obj)
             item.add_button(
                 _("Quit editing"),
                 url=url,

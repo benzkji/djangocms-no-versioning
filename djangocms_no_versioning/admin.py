@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 
 from cms.admin.utils import CONTENT_PREFIX, ChangeListActionsMixin, GrouperModelAdmin
 from cms.models import PageContent
+from cms.toolbar.utils import get_object_preview_url
 from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import add_url_parameters, static_with_version, admin_reverse
@@ -970,7 +971,9 @@ class VersionAdmin(
         self.message_user(request, _("Version published"))
         # Redirect to changelist or live version, depending on referrer
         if "/admin/cms/placeholder/" in request.META.get("HTTP_REFERER", ""):
-            return redirect(version.content.get_absolute_url())
+            if hasattr(version.content, "get_absolute_url"):
+                return redirect(version.content.get_absolute_url())
+            return redirect(get_object_preview_url(version.content))
         return redirect(
             admin_reverse(
                 f"{version.content._meta.app_label}_{version.content._meta.model_name}_changelist"

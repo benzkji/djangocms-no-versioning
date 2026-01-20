@@ -41,6 +41,8 @@ class PublisherExtension(CMSAppExtension):
     def __init__(self):
         self.versionables = []
 
+    contract = "djangocms_versioning", VersionableItem
+
     @cached_property
     def versionables_by_content(self):
         """Returns a dict of {content_model_cls: VersionableItem obj}"""
@@ -308,20 +310,14 @@ class PublisherCMSConfig(CMSAppConfig):
             grouper_field_name="page",
             extra_grouping_fields=["language"],
             version_list_filter_lookups={"language": get_language_tuple},
-            # copy_function=copy_page_content,
-            # grouper_selector_option_label=label_from_instance,
             on_publish=on_page_content_publish,
             on_unpublish=on_page_content_unpublish,
-            # on_draft_create=on_page_content_draft_create,
-            # on_archive=on_page_content_archive,
             copy_function=None,
             grouper_selector_option_label=None,
             on_draft_create=None,
             on_archive=None,
             content_admin_mixin=VersioningCMSPageAdminMixin,
-            # content_admin_mixin=ExtendedVersionAdminMixin,
         )
     ]
-    # cms_toolbar_mixin = CMSToolbarVersioningMixin
     PageContent.add_to_class("is_editable", indicators.is_editable)
     PageContent.add_to_class("content_indicator", indicators.content_indicator)

@@ -32,7 +32,8 @@ class VersionableItem(BaseVersionableItem):
         on_draft_create=None,
         on_archive=None,
         grouper_selector_option_label=False,
-        content_admin_mixin=None,
+        grouper_admin_mixin: type | None = None,
+        content_admin_mixin: type | None = None,
         preview_url=None,
     ):
         super().__init__(content_model, content_admin_mixin)
